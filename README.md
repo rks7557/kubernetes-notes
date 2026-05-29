@@ -94,4 +94,8 @@ If recommendation service fails, video streaming still works.
 
 # Kubernetes Architecture :-
 
+A Kubernetes Cluster consists of:
+
+Control Plane (Master Node)
+Worker Nodes
 
