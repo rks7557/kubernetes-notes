@@ -371,3 +371,45 @@ when we run command "kubeadm init", it will generate the following things:-
 
 ✅ Prepares cluster for worker nodes
 
+
+What kubeadm Does NOT Do :-
+
+❌ Install container runtime
+
+❌ Install kubelet
+
+❌ Install kubectl
+
+❌ Install CNI plugin
+
+❌ Manage applications
+
+❌ Upgrade OS
+
+We need to install these separately.
+
+* Kubernetes Components Required Before kubeadm
+
+Container runtime -> Containerd -> kubelet -> kubectl -> kubeadm
+
+We can verify like :-
+
+kubeadm version
+kubectl version --client
+kubelet --version
+
+# Kubeadm architecture
+
+                kubeadm init
+                       |
+                       |
+     ---------------------------------
+     |               |              |
+ API Server      Scheduler      Controller
+     |
+     |
+   etcd
+
+Worker nodes join using:
+kubeadm join
+
