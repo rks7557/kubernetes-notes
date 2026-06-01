@@ -735,8 +735,11 @@ Go to terminal :-
 vi install_kind.sh
 
 #!/bin/bash
+
 [$(uname -m) = x86_64] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+
 chmod +x ./kind
+
 sudo cp ./kind /usr/local/bin/bash
 
 VERSION = "v1.30.0"
@@ -744,22 +747,35 @@ VERSION = "v1.30.0"
 url = "https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
 
 INSTALL_DIR = "/usr/local/bin"
+
 curl -Lo "$URL"
+
 chmod +x kubectl
+
 sudo mv kubectl $INSTALL_DIR/
+
 kubectl version --client
+
 rm -rf kubectl
+
 rm -rf kind
+
 echo "kind & kubectl installation complete."
 
 
 # Install docker to run kind
 
 sudo apt-get update
+
 sudo apt-get install docker.io
+
 sudo usermod -aG docker $USER && newgrp docker
+
 docker ps
+
 docker --version
+
 kubectl version
+
 kind version
 
