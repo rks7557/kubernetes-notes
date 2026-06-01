@@ -413,3 +413,353 @@ kubelet --version
 Worker nodes join using:
 kubeadm join
 
+
+Important kubeadm Commands
+1. Initialize Control Plane
+sudo kubeadm init
+
+Creates:
+
+Control Plane Node
+API Server
+Scheduler
+Controller Manager
+etcd
+Certificates
+2. Initialize with Pod Network CIDR
+
+Example:
+
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+Common for:
+
+Calico
+Flannel
+3. Setup kubectl Access
+
+After successful init:
+
+mkdir -p $HOME/.kube
+
+sudo cp -i /etc/kubernetes/admin.conf \
+$HOME/.kube/config
+
+sudo chown $(id -u):$(id -g) \
+$HOME/.kube/config
+
+Verify:
+
+kubectl get nodes
+4. Join Worker Node
+
+Generated automatically:
+
+kubeadm join 10.0.0.10:6443 \
+--token abcdef.1234567890abcdef \
+--discovery-token-ca-cert-hash sha256:xxxx
+
+Worker node contacts API server and joins cluster.
+
+5. Generate New Join Token
+
+If token expires:
+
+kubeadm token create
+6. Print Join Command
+kubeadm token create --print-join-command
+
+Example:
+
+kubeadm join 192.168.1.10:6443 \
+--token xxxxx \
+--discovery-token-ca-cert-hash sha256:xxxxx
+7. Check Existing Tokens
+kubeadm token list
+
+Output:
+
+TOKEN                     TTL
+abcdef.1234567890abcd     23h
+8. Reset Cluster
+
+Removes cluster configuration.
+
+sudo kubeadm reset
+
+Used when rebuilding cluster.
+
+kubeadm Cluster Initialization Workflow
+kubeadm init
+     |
+     |
+Generate Certificates
+     |
+Generate kubeconfig Files
+     |
+Create Static Pod Manifests
+     |
+Start etcd
+     |
+Start API Server
+     |
+Start Controller Manager
+     |
+Start Scheduler
+     |
+Generate Join Token
+     |
+Cluster Ready
+Static Pods Created by kubeadm
+
+After initialization:
+
+ls /etc/kubernetes/manifests
+
+Files:
+
+etcd.yaml
+
+kube-apiserver.yaml
+
+kube-controller-manager.yaml
+
+kube-scheduler.yaml
+
+These are called Static Pods.
+
+What Are Static Pods?
+
+Managed directly by kubelet.
+
+Location:
+
+/etc/kubernetes/manifests/
+
+Kubelet continuously watches this directory.
+
+If file exists:
+
+Manifest Exists
+      ↓
+Kubelet Creates Pod
+
+If deleted:
+
+Manifest Removed
+      ↓
+Pod Removed
+Important kubeadm Files
+admin.conf
+/etc/kubernetes/admin.conf
+
+Used by kubectl.
+
+Contains:
+
+Cluster endpoint
+Certificates
+Credentials
+PKI Directory
+/etc/kubernetes/pki/
+
+Contains certificates.
+
+Examples:
+
+ca.crt
+ca.key
+
+apiserver.crt
+apiserver.key
+Manifests Directory
+/etc/kubernetes/manifests/
+
+Contains static pod definitions.
+
+How kubeadm Creates Control Plane Components
+
+Example:
+
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+
+You will see:
+
+kind: Pod
+
+metadata:
+  name: kube-apiserver
+
+Kubelet reads it and starts API Server container.
+
+HA (High Availability) with kubeadm
+
+kubeadm supports:
+
+1 Load Balancer
+3 Control Plane Nodes
+Multiple Worker Nodes
+
+Architecture:
+
+            Load Balancer
+                   |
+        ---------------------
+        |         |         |
+        v         v         v
+      CP1       CP2       CP3
+        |
+        |
+   Worker Nodes
+
+Benefits:
+
+No single point of failure
+Better availability
+Upgrading Kubernetes with kubeadm
+
+Check plan:
+
+kubeadm upgrade plan
+
+Upgrade:
+
+kubeadm upgrade apply v1.xx.x
+
+Upgrade kubelet:
+
+apt install kubelet
+systemctl restart kubelet
+
+Verify:
+
+kubectl get nodes
+Troubleshooting kubeadm
+Check Cluster Info
+kubectl cluster-info
+Check Nodes
+kubectl get nodes
+Check Static Pods
+kubectl get pods -n kube-system
+Check kubelet Logs
+journalctl -u kubelet -f
+Check Container Runtime
+systemctl status containerd
+Check Certificates
+kubeadm certs check-expiration
+Real-World kubeadm Deployment Flow
+Install Ubuntu
+      ↓
+Install Containerd
+      ↓
+Install kubeadm
+      ↓
+Install kubelet
+      ↓
+Install kubectl
+      ↓
+Disable Swap
+      ↓
+kubeadm init
+      ↓
+Configure kubectl
+      ↓
+Install CNI (Calico)
+      ↓
+Worker Nodes Join
+      ↓
+Deploy Applications
+
+
+# Kind Cluster
+
+KIND (Kubernetes IN Docker) is a tool that runs a complete Kubernetes cluster inside Docker containers.
+
+KIND is mainly used for:
+
+Learning Kubernetes
+Development
+Testing
+CI/CD Pipelines
+Certification Practice (CKA, CKAD)
+
+Why KIND?
+
+Normally, to create a Kubernetes cluster you need:
+
+Control Plane VM
+Worker Node VM
+Networking
+Storage
+
+This requires significant resources.
+
+With KIND:
+
+Laptop->Docker->KIND->Kubernetes Cluster
+
+No VMs required.
+
+How KIND works ?
+
+KIND works as a docker containers that works as a kubernetes nodes.
+
+Docker host -> Control Plane -> Worker-1 -> Worker-2
+
+Each node is actually a docker container.
+
+# Kind architecture
+
+Docker Engine -> KIND Node(Container) -> Kubernetes components
+
+Inside the container:
+
+kubelet
+kubeadm
+containerd
+API Server
+Scheduler
+Controller Manager
+
+# In my case i'm taking Amazon EC2 .
+
+1. take t2.medium 
+enable ssh/http/https
+storage 30GB
+OS -> UBUNTU
+
+then launch instance.
+
+Go to terminal :-
+
+vi install_kind.sh
+
+#!/bin/bash
+[$(uname -m) = x86_64] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+chmod +x ./kind
+sudo cp ./kind /usr/local/bin/bash
+
+VERSION = "v1.30.0"
+
+url = "https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
+
+INSTALL_DIR = "/usr/local/bin"
+curl -Lo "$URL"
+chmod +x kubectl
+sudo mv kubectl $INSTALL_DIR/
+kubectl version --client
+rm -rf kubectl
+rm -rf kind
+echo "kind & kubectl installation complete."
+
+
+# Install docker to run kind
+
+sudo apt-get update
+sudo apt-get install docker.io
+sudo usermod -aG docker $USER && newgrp docker
+docker ps
+docker --version
+kubectl version
+kind version
+
