@@ -327,5 +327,47 @@ Passwords
 API Keys
 Certificates
 Tokens
->>>>>>> e660bf0 (Kubernetes architecture)
+
+
+# Kubeadm in Kubernetes
+
+kubeadm is an official Kubernetes tool used to bootstrap (create and configure) Kubernetes clusters quickly and consistently.
+
+ex :- kubeadm = Kubernetes Cluster Setup Tool
+
+It automates the installation and configuration of Kubernetes control plane components.
+
+Why kubeadm?
+
+Before kubeadm, setting up a cluster required manually configuring:
+
+API Server
+Scheduler
+Controller Manager
+etcd
+Certificates
+Networking
+
+This was time-consuming and error-prone.
+
+kubeadm automates these tasks.
+
+
+What kubeadm Does ?
+
+when we run command "kubeadm init", it will generate the following things:-
+
+✅ Generates certificates
+
+✅ Creates kubeconfig files
+
+✅ Starts control plane components
+
+✅ Configures etcd
+
+✅ Creates static pod manifests
+
+✅ Generates join token
+
+✅ Prepares cluster for worker nodes
 
