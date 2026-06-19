@@ -802,3 +802,22 @@ extraPortMappings:
 - containerPort: 443
   hostPort: 443
   protocol: TCP
+
+# Kubernetes Service
+
+A service in Kubernetes provides a stable way to access pods.
+
+WHY??
+
+Pods are impheral, means :-
+
+1. Pods are crash.
+2. Pods can be recreated.
+3. Pods IP changes.
+
+Ex --> Before restart.
+            frontend IP : 10.244.1.10
+      After restart.
+            frontend IP : 10.244.1.25
+
+It means that without service the applications would constantly lose connectivity.
