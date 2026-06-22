@@ -874,3 +874,149 @@ spec:
     -port: 80
 
      targetPort: 80   # here Kubetnets automatically finds pods with app: nginx
+
+
+# Types of Kubernetes Service
+
+1. Cluster IP 
+2. Node Port
+3. Load Balancers
+4. External Name
+5. Headless Service
+
+1. ClusterIP.yml
+
+apiVerison: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+    port: 80
+    targetPort: 8080
+
+To apply and check
+
+kubectl apply -f ClusterIP.yml
+
+kubectl get svc
+
+it will get output like :-
+
+backend     clusterIP   10.xx.xx.xx
+
+# Real World scnerios
+
+E-Commerce Application
+
+Frontend -> Backend Service -> Backend Pods  
+
+**Users never directly access the backend pods, only frontend will communicate to backend.**
+
+# NodePort 
+
+Exposes service on every node.
+
+spec:
+  type: NodePort
+
+
+nodeport.yml
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: nginx-nodeport
+
+spec:
+
+  type: NodePort
+
+  selector:
+
+    app: nginx
+
+  ports:
+
+    - port: 80
+
+      targetPort: 80
+
+      nodePort: 30080
+
+ex:- http://192.168.xx.xx:30080
+
+# Real World Example
+
+Testing in kind/minikube
+
+we can deploy :- FastAPI, PostgresSQL, Redis
+
+# Load Balancer
+
+spec:
+  type: LoadBalancer
+
+ex:-
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: web
+
+spec:
+
+  type: LoadBalancer
+
+  selector:
+
+      app: web
+
+  ports:
+
+      - port: 80
+
+        targetPort: 80
+
+**Cloud provider automatically creates :- AWS ELB/NLB, Azure Load Balancer, GCP Load balancer.
+
+NodePort V/s LoadBalancer
+
+NodePort :- User -> nodeip: 30080 -> Pods
+LoadBalancer :- User -> AWS ELB -> Pods
+
+# External Names
+
+Maps kubernetes services to an external DNS.
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: mysql-external
+
+spec:
+
+  type: ExternalName
+
+  externalName: mydb.rds.amazonaws.com
+
+# Real world scnerios
+
+Database running on :-
+
+AWS RDS, Azure SQL, External oracle db.
+
+instead of hardcoding :- mydb.rds.amazonaws.com application runs on mysql-external, here if databse changes later only service changes.
+
