@@ -1070,3 +1070,104 @@ Why Headless?
 Normal service:- mysql-service -> load balaning -> mysql-0/mysql-1/mysql-2 (don't know which pods you're hitting)
 
 Headless service:- mysql-0.mysql/mysql-1.mysql/mysql-2.mysql (Each pods gets its own DNS)
+
+# Ingress
+
+It is an kubernetes API object that manages external HTTP/HTTPS traffic and routes it to services inside the cluster.
+
+Think of it is a reverse proxy for kubernetes application.
+
+
+Without Ingress :-
+
+Suppose you have 3 applications, each applications is accessable through internet and each application is having there own LB.
+
+APP1->LB1
+
+APP2->LB2
+
+APP3->LB3
+
+here problem is, we have multiple LBs, high cloud cost, More NDS record to manage.
+
+With Ingress :-
+
+Internet --> LB --> Ingress Controller --> App1/App2/App3 (One load balancer handles all the applications).
+
+Ingress Resource is not equal to Ingress controller.
+
+Ingress Resource
+
+------------------------------------------------
+
+just a .yml configuration
+
+kind: Ingress (Defines routes)
+
+Ingress Controller
+
+---------------------------------------------------
+
+Actual software that processes traffic.
+
+1. NGINX Ingress Controller
+2. Traefik
+3. HAProxy Ingress
+4. AWS Cloud Balancer Controller
+
+Without a controller, when we run 
+
+kubectl apply -f ingress.yml --> ingress will exist but won't work.
+
+* Path based routing
+
+services - referral-service and complaint-service
+
+apiVersion: networking.k8s.io/v1
+
+kind: Ingress
+
+metadata:
+
+  name: company-ingress
+
+spec:
+
+  ingressClassName: nginx
+
+  rules:
+
+  - host: company.com
+
+    http:
+
+      paths:
+
+      - path: /referral
+
+        pathType: Prefix
+
+        backend:
+
+          service:
+
+            name: referral-service
+
+            port:
+
+              number: 80
+
+      - path: /complaints
+
+        pathType: Prefix
+
+        backend:
+
+          service:
+
+            name: complaints-service
+
+            port:
+
+              number: 80
+              
