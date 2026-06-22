@@ -821,3 +821,51 @@ Ex --> Before restart.
             frontend IP : 10.244.1.25
 
 It means that without service the applications would constantly lose connectivity.
+
+A service provider provides :-
+
+Frontend ---> Service IP (stable) --> Backend Pods
+
+Q. How services find pods?
+--> Services uses labels and selector to find pods.
+
+deployement.yml
+
+apiVersion: app/v1
+kind: Deployment
+
+metadata:
+    name: nginx
+spec:
+    replicas: 3
+    selector:
+        matchlabels:
+            app: nginx
+    template:
+        metadata:
+            labels:
+               apps: nginx
+
+
+To apply this .yml file we need to run below commands :-
+
+kubectl apply -f deployment.yml
+
+To check :-
+
+kubectl get svc
+
+service.yml
+
+apiVersion: v1
+kind: Service
+
+metadata:
+    name: nginx-service
+spec:
+    selector:
+      app: nginx
+      
+    ports:
+      -port: 80
+      targetPort: 80   # here Kubetnets automatically finds pods with app: nginx
