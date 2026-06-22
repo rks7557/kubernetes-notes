@@ -858,14 +858,19 @@ kubectl get svc
 service.yml
 
 apiVersion: v1
+
 kind: Service
 
 metadata:
-    name: nginx-service
+
+  name: nginx-service
 spec:
-    selector:
-      app: nginx
-      
-    ports:
-      -port: 80
-      targetPort: 80   # here Kubetnets automatically finds pods with app: nginx
+
+  selector:
+
+    app: nginx
+  ports:
+
+    -port: 80
+
+     targetPort: 80   # here Kubetnets automatically finds pods with app: nginx
