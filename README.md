@@ -876,6 +876,7 @@ spec:
      targetPort: 80   # here Kubetnets automatically finds pods with app: nginx
 
 
+
 # Types of Kubernetes Service
 
 1. Cluster IP 
