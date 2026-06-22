@@ -880,23 +880,37 @@ spec:
 # Types of Kubernetes Service
 
 1. Cluster IP 
+
 2. Node Port
+
 3. Load Balancers
+
 4. External Name
+
 5. Headless Service
 
 1. ClusterIP.yml
 
 apiVerison: v1
+
 kind: Service
+
 metadata:
+
   name: backend
+
 spec:
+
   type: ClusterIP
+
   selector:
+
     app: backend
+
   ports:
+
     port: 80
+
     targetPort: 8080
 
 To apply and check
@@ -922,6 +936,7 @@ Frontend -> Backend Service -> Backend Pods
 Exposes service on every node.
 
 spec:
+
   type: NodePort
 
 
@@ -962,6 +977,7 @@ we can deploy :- FastAPI, PostgresSQL, Redis
 # Load Balancer
 
 spec:
+
   type: LoadBalancer
 
 ex:-
@@ -993,6 +1009,7 @@ spec:
 NodePort V/s LoadBalancer
 
 NodePort :- User -> nodeip: 30080 -> Pods
+
 LoadBalancer :- User -> AWS ELB -> Pods
 
 # External Names
@@ -1021,3 +1038,35 @@ AWS RDS, Azure SQL, External oracle db.
 
 instead of hardcoding :- mydb.rds.amazonaws.com application runs on mysql-external, here if databse changes later only service changes.
 
+# Headless Service
+
+very important to stateful set
+
+clusterIP: None
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: mysql
+
+spec:
+
+  clusterIP: None
+
+  selector:
+
+    app: mysql
+
+  ports:
+
+    - port: 3306
+
+
+Why Headless?
+
+Normal service:- mysql-service -> load balaning -> mysql-0/mysql-1/mysql-2 (don't know which pods you're hitting)
+
+Headless service:- mysql-0.mysql/mysql-1.mysql/mysql-2.mysql (Each pods gets its own DNS)
